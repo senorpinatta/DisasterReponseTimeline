@@ -28,6 +28,19 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 def load_data(database_filepath):
+    '''
+    load_data
+    loads data from `database_filepath` into variables X, Y, category_names
+    
+    Input:
+    database_filepath     filepath to disaster data
+    
+    Returns:
+    X                      dataframe of target variable (message)
+    Y                      dataframe of message categories
+    category_names         list of category names
+    '''
+    
     # load data from database
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('DisasterData', engine)
@@ -39,6 +52,17 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    '''
+    tokenize
+    tokenize message data
+    
+    Input:
+    text       string of message data
+    
+    Returns:
+    tokens     list of tokenized words
+    '''
+    
     stop_words = stopwords.words("english")
     lemmatizer = WordNetLemmatizer()
     
@@ -55,16 +79,46 @@ def tokenize(text):
 
 
 def build_model():
+    '''
+    build_model
+    construct classification pipeline that uses gridsearch
+    
+    Input:
+    
+    Returns:
+    pipeline    model pipeline
+    '''
+    
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(RandomForestClassifier())),
     ])
     
+    parameters = {'tfidf__use_idf':[True, False],
+              'clf__estimator__n_estimators':[2,5],
+              'clf__estimator__min_samples_leaf':[2,5]}
+
+    cv = GridSearchCV(pipeline, param_grid=parameters)
+    
     return pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    evaluate_model
+    evaluates model based on classification and accuracy scores
+    
+    Input:
+    model               model to be evalueated
+    X_test              test messages
+    Y_test              test message categories
+    category_names      list of category names
+    
+    Returns:
+    
+    '''
+    
     # predict on the test data
     y_pred = model.predict(X_test)
     for i, cat in enumerate(category_names):
@@ -72,6 +126,18 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    save_model
+    saves the model at the specified `model_filepath`
+    
+    Input:
+    model              model to save
+    model_filepath     filepath by which to save the model
+    
+    Returns:
+                          
+    '''
+    
     pickle.dump(model, open(model_filepath, 'wb'))
 
 

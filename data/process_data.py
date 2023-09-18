@@ -3,6 +3,18 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    load_data
+    load data from csv files and merge into single dataframe
+    
+    Input:
+    messages_filepath       filepath to messages csv file
+    categories_filepath     filepath to categories csv file
+    
+    Returns:
+    df                      dataframe merging categories and messages
+    '''
+    
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = messages.merge(categories, on='id', how='left')
@@ -10,6 +22,18 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''
+    clean_data
+    dataframe cleaned of stop words, duplicates, nulls and
+    unnecessary data
+    
+    Input:
+    df       merged dataframe
+    
+    Returns:
+    df       cleaned dataframe
+    '''
+    
     # create a dataframe of the 36 individual category columns
     categories = df.categories.str.split(pat=';', expand=True)
     
@@ -30,8 +54,14 @@ def clean_data(df):
         # convert column from string to numeric
         categories[column] = categories[column].astype(int)
         
+    # convert erroneous 2 values to 1
+    categories['related'] = categories['related'].map(lambda x: 1 if x == 2 else x)
+        
     # drop the original categories column from `df`
     df.drop('categories', axis=1, inplace=True)
+    
+    # drop unnecessary column with nulls from dataset
+    df = df.drop('original', axis = 1)
     
     # concatenate the original dataframe with the new `categories` dataframe
     df = pd.concat([df, categories], axis=1)
@@ -43,8 +73,20 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''
+    save_data
+    saves dataframe `df` as `database_filename` 
+    
+    Input:
+    df                    merged and cleaned dataframe
+    database_filename     name to save database file
+    
+    Returns:
+    
+    '''
+    
     engine = create_engine('sqlite:///' + database_filename)
-    df.to_sql('DisasterData', engine, index=False)
+    df.to_sql('DisasterData', engine, index=False, if_exists='replace')
 
 
 def main():
