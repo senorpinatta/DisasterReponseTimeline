@@ -1,5 +1,22 @@
 # Disaster Response Pipeline Project
 
+### Project File Structure
+- Root
+    - app
+        - templates
+            - go.html
+            - master.html
+        - run.py
+    - data
+        - DisasterResponse.db
+        - disaster_categories.csv
+        - disaster_messages.csv
+        - process_date.py
+    - models
+        - classifier.pkl
+        - train_classifier.py
+
+
 ### Project Goals
 
 - Analyze disaster data from [Appen](appen.com) (formally Figure 8) to build a model for an API that classifies disaster messages.
@@ -7,6 +24,7 @@
  - Create a machine learning pipeline to categorize these events so that you can send the messages to an appropriate disaster relief agency.
 
 - Build a web app where an emergency worker can input a new message and get classification results in several categories. The web app will also display visualizations of the data.
+
 
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
