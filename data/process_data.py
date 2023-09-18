@@ -86,11 +86,7 @@ def save_data(df, database_filename):
     '''
     
     engine = create_engine('sqlite:///' + database_filename)
-<<<<<<< HEAD
     df.to_sql('DisasterData', engine, index=False, if_exists='replace')
-=======
-    df.to_sql('DisasterData', engine, index=False, if_exists = 'replace')
->>>>>>> 557d2a1dfaeb91060e99c4b523b890598479bc6b
 
 
 def main():
